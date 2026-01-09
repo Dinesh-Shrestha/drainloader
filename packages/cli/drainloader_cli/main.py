@@ -1,21 +1,24 @@
+import signal
+import sys
+import threading
+
 import click
 
-from megaloader.plugins import PLUGIN_REGISTRY
-
-from megaloader_cli.commands import download_command, extract_command
-from megaloader_cli.utils import console, setup_logging
+from drainloader.plugins import PLUGIN_REGISTRY
+from drainloader_cli.commands import download_command, extract_command
+from drainloader_cli.utils import console, setup_logging
 
 
 @click.group()
-@click.version_option(prog_name="megaloader")
+@click.version_option(prog_name="drainloader")
 def cli() -> None:
     """
-    Megaloader: Extract and download content from file hosting platforms.
+    Drainloader: High-speed downloader for Pixeldrain.
 
     Examples:
-      megaloader extract https://pixeldrain.com/l/abc123
-      megaloader download https://gofile.io/d/xyz456 ./downloads
-      megaloader plugins
+      drainloader extract https://pixeldrain.com/l/abc123
+      drainloader download https://pixeldrain.com/u/xyz789 ./downloads
+      drainloader download --aria2c https://pixeldrain.com/l/def456
     """
 
 
@@ -53,8 +56,23 @@ def extract_cmd(url: str, output_json: bool, verbose: bool) -> None:
     help="Filter files by glob pattern (e.g., *.jpg, *.mp4)",
 )
 @click.option(
-    "--password",
-    help="Password for protected content (Gofile)",
+    "--aria2c",
+    is_flag=True,
+    help="Use aria2c for downloads",
+)
+@click.option(
+    "--aria2c-native",
+    is_flag=True,
+    help="Use native aria2c interface (shows detailed output)",
+)
+@click.option(
+    "--aria2c-args",
+    help="Additional arguments for aria2c",
+)
+@click.option(
+    "--overwrite",
+    is_flag=True,
+    help="Overwrite existing files (default: resume/skip)",
 )
 def download_cmd(
     url: str,
@@ -62,7 +80,10 @@ def download_cmd(
     verbose: bool,
     flat: bool,
     pattern: str | None,
-    password: str | None,
+    aria2c: bool,
+    aria2c_native: bool,
+    aria2c_args: str | None,
+    overwrite: bool,
 ) -> None:
     """
     Download content from URL to OUTPUT_DIR.
@@ -72,9 +93,12 @@ def download_cmd(
     """
     setup_logging(verbose)
 
-    options = {}
-    if password:
-        options["password"] = password
+    options = {
+        "aria2c": aria2c,
+        "aria2c_native": aria2c_native,
+        "aria2c_args": aria2c_args,
+        "overwrite": overwrite,
+    }
 
     download_command(url, output_dir, flat, pattern, options)
 
@@ -91,5 +115,21 @@ def list_plugins_cmd() -> None:
     console.print()
 
 
+def signal_handler(sig, frame):
+    sys.exit(1)
+
+
+def main():
+    signal.signal(signal.SIGINT, signal_handler)
+    
+    # Run in a daemon thread for responsive interruption
+    main_thread = threading.Thread(target=cli)
+    main_thread.daemon = True
+    main_thread.start()
+    
+    while main_thread.is_alive():
+        main_thread.join(timeout=0.1)
+
+
 if __name__ == "__main__":
-    cli()
+    main()

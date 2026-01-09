@@ -1,131 +1,73 @@
-# [monorepo]: megaloader
+# drainloader
 
-<img src="assets/logo.svg" alt="Megaloader Logo" width="100">
+High-speed, dedicated downloader for [pixeldrain.com](https://pixeldrain.com) powered by `aria2c`.
 
-[![CodeQL](https://github.com/totallynotdavid/megaloader/actions/workflows/codeql.yml/badge.svg)](https://github.com/totallynotdavid/megaloader/actions/workflows/codeql.yml)
-[![lint and format check](https://github.com/totallynotdavid/megaloader/actions/workflows/checks.yml/badge.svg)](https://github.com/totallynotdavid/megaloader/actions/workflows/checks.yml)
-[![codecov](https://codecov.io/gh/totallynotdavid/megaloader/graph/badge.svg?token=SBHAGJJB8L)](https://codecov.io/gh/totallynotdavid/megaloader)
+## Features
 
-Python library and CLI for extracting downloadable content from file hosting
-platforms. Supports 11 platforms through a plugin architecture with automatic
-URL detection.
+- **Dedicated to Pixeldrain**: Specialized extraction for lists and individual files.
+- **High-Speed Downloads**: Optional `aria2c` integration for multi-connection acceleration.
+- **Smart Resumption**: Automatically resumes interrupted downloads (default).
+- **Clean CLI**: Minimalist and focused command-line interface.
+- **Robust Interruptions**: Instant response to `Ctrl+C`.
 
-Megaloader is available as two independent packages:
+## Installation
 
 ```bash
-pip install megaloader          # core library
-pip install megaloader-cli      # terminal CLI
+# Recommendation: use uv to install
+pip install .
 ```
-
-Install one or both depending on whether you need API integration, command-line
-tools, or both.
 
 ## Usage
 
-Library usage:
-
-```python
-from megaloader import extract
-
-for item in extract("https://pixeldrain.com/l/abc123"):
-    print(f"{item.filename} - {item.download_url}")
-```
-
-CLI usage:
-
+### Basic Usage
 ```bash
-megaloader download https://pixeldrain.com/l/abc123
+drainloader download https://pixeldrain.com/l/abc123
 ```
 
-More detailed information is available in the package-specific documentation:
+### High-Speed (aria2c)
+```bash
+drainloader download --aria2c https://pixeldrain.com/u/xyz789
+```
 
-- Core library: [packages/core/readme.md](packages/core/readme.md)
-- CLI: [packages/cli/readme.md](packages/cli/readme.md)
+### Advanced aria2c Arguments
+```bash
+drainloader download --aria2c --aria2c-args="-x 16 -s 16" https://pixeldrain.com/l/def456
+```
 
-## Supported platforms
+### Dry Run (Extract Metadata)
+```bash
+drainloader extract https://pixeldrain.com/l/abc123
+```
 
-The library supports four core platforms with active maintenance and seven
-extended platforms on best-effort basis. Core platforms receive priority for bug
-fixes and feature development. Extended platforms work as of November 2025 but
-may break without immediate fixes.
+## Command Line Options
 
-| Platform    | Domains                | Supports                                      | Status   |
-| ----------- | ---------------------- | --------------------------------------------- | -------- |
-| Bunkr       | bunkr.{si,la,is,ru,su} | Albums, single files                          | Core     |
-| PixelDrain  | pixeldrain.com         | Lists, files, proxy support                   | Core     |
-| Cyberdrop   | cyberdrop.{me,to,cr}   | Albums, single files                          | Core     |
-| GoFile      | gofile.io              | Folders (including password-protected), files | Core     |
-| Fanbox      | {creator}.fanbox.cc    | Creator content, authentication               | Extended |
-| Pixiv       | pixiv.net              | Artworks, galleries, authentication           | Extended |
-| Rule34      | rule34.xxx             | Tags, posts, API                              | Extended |
-| ThotsLife   | thotslife.com          | Albums, posts                                 | Extended |
-| ThotHub.VIP | thothub.vip            | Videos, albums                                | Extended |
-| ThotHub.TO  | thothub.to             | Videos, albums                                | Extended |
-| Fapello     | fapello.com            | Model profiles                                | Extended |
+- `--aria2c`: Enable high-speed downloads via `aria2c`.
+- `--aria2c-args`: Custom arguments for `aria2c`.
+- `--overwrite`: Force re-download even if file exists.
+- `--flat`: Download all files directly into the output directory (ignore collections).
+- `--filter`: Filter files by glob pattern (e.g., `*.jpg`).
 
-Additional notes on authentication and platform-specific features are documented
-in the core library's [readme](packages/core/readme.md).
+## CLI vs Library
+
+Drainloader is built on a modular architecture:
+- Core extraction logic is in `packages/core`.
+- CLI interface is in `packages/cli`.
 
 ## Development
 
-This monorepo uses a uv workspace. The core library is in
-[`packages/core/`](packages/core/) and the CLI tool is in
-[`packages/cli/`](packages/cli/). Each one is published to PyPI as a separate
-package.
-
-The repository is organized like this:
-
-```
-megaloader/
-├── apps/
-│   ├── api/        # FastAPI server (deployed to Vercel)
-│   └── docs/       # VitePress site (deployed to GitHub Pages)
-├── packages/
-│   ├── core/       # megaloader, the core library
-│   └── cli/        # megaloader-cli, the command-line interface
-├── scripts/        # Development utilities
-└── assets/         # Static files
-```
-
-To set up a development environment, clone the repository and install all
-workspace dependencies:
+Set up a development environment using `uv`:
 
 ```bash
-git clone https://github.com/totallynotdavid/megaloader
-cd megaloader
 uv sync
 ```
 
-If you prefer to manage tools with mise, run:
-
+Run tests and checks:
 ```bash
-mise install
-mise run sync
+uv run ruff format .
+uv run ruff check --fix .
+uv run pytest
 ```
 
-This installs the toolchain versions defined in [`mise.toml`](mise.toml).
+## Acknowledgments
 
-Before submitting changes, run the formatters, linters, and tests:
-
-```bash
-uv run ruff format .        # mise run format
-uv run ruff check --fix .   # mise run format
-uv run mypy packages/core   # mise run mypy
-uv run pytest               # mise run test, mise run test-unit
-```
-
-These commands format the code, fix lint issues, check types, and run the test
-suite.
-
-See [.github/CONTRIBUTING.md](.github/CONTRIBUTING.md) for plugin development
-guidelines.
-
-## Project history
-
-Originally created by [@Ximaz](https://github.com/Ximaz) before 2023. The
-repository was later deleted or made private. Current maintainer
-[@totallynotdavid](https://github.com/totallynotdavid) rebuilt the codebase from
-scratch to fix platform changes and modernize the architecture.
-
-Feature discussions and issue reports take place on
-[GitHub Discussions](https://github.com/totallynotdavid/megaloader/discussions).
+Based on the original `megaloader` project. Refactored to focus exclusively on Pixeldrain excellence.

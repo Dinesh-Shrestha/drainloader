@@ -1,15 +1,11 @@
 """
-Megaloader - Extract downloadable content metadata from file hosting platforms.
+Drainloader - High-speed Pixeldrain downloader.
 
 Basic usage:
-    import megaloader as mgl
+    import drainloader as dl
 
-    for item in mgl.extract(url):
+    for item in dl.extract(url):
         print(item.url, item.filename)
-
-    # With plugin-specific options
-    items = mgl.extract(url, password="secret")
-    items = mgl.extract(url, session_id="cookie_value")
 """
 
 import logging
@@ -18,44 +14,31 @@ import urllib.parse
 from collections.abc import Generator
 from typing import Any
 
-from megaloader.exceptions import ExtractionError, UnsupportedDomainError
-from megaloader.item import DownloadItem
-from megaloader.plugins import get_plugin_class
+from drainloader.exceptions import DrainloaderError, ExtractionError, UnsupportedDomainError
+from drainloader.item import DownloadItem
+from drainloader.plugins import get_plugin_class
 
 
 logging.getLogger(__name__).addHandler(logging.NullHandler())
 logger = logging.getLogger(__name__)
 
-__version__ = "0.2.0"
-__all__ = ["DownloadItem", "ExtractionError", "UnsupportedDomainError", "extract"]
+__version__ = "1.0.0"
+__all__ = ["DownloadItem", "DrainloaderError", "ExtractionError", "UnsupportedDomainError", "extract"]
 
 
 def extract(url: str, **options: Any) -> Generator[DownloadItem, None, None]:
     """
-    Extract downloadable items from a URL.
+    Extract downloadable items from a Pixeldrain URL.
 
     Returns a generator that yields items lazily as they're discovered.
     Network requests happen during iteration, not at call time.
 
     Args:
         url: The source URL to extract from
-        **options: Plugin-specific options:
-            - password: str (Gofile)
-            - session_id: str (Fanbox, Pixiv)
-            - api_key: str (Rule34)
-            - user_id: str (Rule34)
+        **options: Plugin-specific options
 
     Yields:
         DownloadItem: Metadata for each downloadable file
-
-    Raises:
-        ValueError: Invalid URL format
-        UnsupportedDomainError: No plugin available for domain
-        ExtractionError: Network or parsing failure
-
-    Example:
-        >>> for item in extract("https://pixeldrain.com/l/abc123"):
-        ...     print(item.download_url, item.filename)
     """
     if not url or not url.strip():
         msg = "URL cannot be empty"

@@ -1,12 +1,12 @@
-class MegaloaderError(Exception):
-    """Base exception for all megaloader errors."""
+class DrainloaderError(Exception):
+    """Base exception for all drainloader errors."""
 
 
-class ExtractionError(MegaloaderError):
+class ExtractionError(DrainloaderError):
     """Failed to extract items from URL due to network or parsing error."""
 
 
-class UnsupportedDomainError(MegaloaderError):
+class UnsupportedDomainError(DrainloaderError):
     """No plugin available for this domain."""
 
     def __init__(self, domain: str) -> None:
