@@ -14,11 +14,6 @@ dependencies = [
     "requests>=2.32.5",
     "click>=8.1.0",
     "rich>=13.7.0",
-    "ruff>=0.9.1",
-    "mypy>=1.14.1",
-    "pytest>=8.3.4",
-    "types-requests>=2.32.0",
-    "types-beautifulsoup4>=4.12.0",
 ]
 
 [project.scripts]
@@ -33,6 +28,15 @@ packages = ["drainloader", "drainloader_cli"]
 
 [tool.uv]
 managed = true
+
+[dependency-groups]
+dev = [
+    "ruff>=0.9.1",
+    "mypy>=1.14.1",
+    "pytest>=8.3.4",
+    "types-requests>=2.32.0",
+    "types-beautifulsoup4>=4.12.0",
+]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

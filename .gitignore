@@ -35,5 +35,4 @@ venv.bak/
 *.log
 
 # Project specific
-uv.lock
 .python-version
