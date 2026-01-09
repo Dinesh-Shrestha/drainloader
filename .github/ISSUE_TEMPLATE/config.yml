@@ -1,0 +1,9 @@
+blank_issues_enabled: true
+
+contact_links:
+  - name: github discussions
+    url: https://github.com/totallynotdavid/megaloader/discussions
+    about: ask questions and discuss ideas with the community
+  - name: contributing guide
+    url: https://github.com/totallynotdavid/megaloader/blob/main/.github/CONTRIBUTING.md
+    about: learn how to contribute to the project

@@ -1,0 +1,55 @@
+[project]
+name = "drainloader"
+version = "0.1.0"
+description = "A high-performance Python library and CLI for specialized Pixeldrain content extraction and high-speed multi-connection downloads."
+readme = "readme.md"
+requires-python = ">=3.10"
+license = { text = "Apache-2.0" }
+authors = [
+    { name = "Dinesh Shrestha" },
+]
+dependencies = [
+    "beautifulsoup4>=4.14.2",
+    "lxml>=6.0.2",
+    "requests>=2.32.5",
+    "click>=8.1.0",
+    "rich>=13.7.0",
+    "ruff>=0.9.1",
+    "mypy>=1.14.1",
+    "pytest>=8.3.4",
+    "types-requests>=2.32.0",
+    "types-beautifulsoup4>=4.12.0",
+]
+
+[project.scripts]
+drainloader = "drainloader_cli.main:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["drainloader", "drainloader_cli"]
+
+[tool.uv]
+managed = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+markers = [
+    "live: mark test as requiring live network access"
+]
+addopts = "-q"
+
+[tool.ruff]
+fix = true
+line-length = 88
+target-version = "py310"
+
+[tool.ruff.lint]
+preview = true
+extend-select = [
+    "A", "B", "BLE", "C4", "C90", "F", "I", "N", "PTH", "Q", "RET", "RUF", "SIM", "UP",
+]
+ignore = ["COM812", "TRY300", "CPY001", "FBT001"]
