@@ -1,7 +1,7 @@
 [project]
 name = "drainloader"
 version = "0.1.0"
-description = "Drainloader: High-speed Pixeldrain downloader"
+description = "A high-performance Python library and CLI for specialized Pixeldrain content extraction and high-speed multi-connection downloads."
 readme = "readme.md"
 requires-python = ">=3.10"
 license = { text = "Apache-2.0" }
