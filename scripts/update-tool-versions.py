@@ -20,7 +20,6 @@ Usage:
 import argparse
 import re
 import sys
-
 from pathlib import Path
 from typing import NamedTuple
 
@@ -37,7 +36,7 @@ class VersionUpdate(NamedTuple):
 class ToolVersionUpdater:
     """Update tool versions across repository files."""
 
-    def __init__(self, repo_root: Path, dry_run: bool = False) -> None:  # noqa: FBT001, FBT002
+    def __init__(self, repo_root: Path, dry_run: bool = False) -> None:
         self.repo_root = repo_root
         self.dry_run = dry_run
         self.updates: list[VersionUpdate] = []

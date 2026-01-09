@@ -16,7 +16,6 @@ Valid blocks are parsed but never executed, making validation safe and fast.
 import ast
 import re
 import sys
-
 from pathlib import Path
 
 

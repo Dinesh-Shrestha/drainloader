@@ -1,20 +1,14 @@
 import dataclasses
 import sys
 import time
-
 from fnmatch import fnmatch
 from pathlib import Path
 from typing import Any
 
-import drainloader as dl
-
-from drainloader.exceptions import DrainloaderError
-from drainloader.plugins import get_plugin_class
 from rich.progress import (
     BarColumn,
     DownloadColumn,
     Progress,
-    ProgressColumn,
     TextColumn,
     TimeRemainingColumn,
     TransferSpeedColumn,
@@ -22,26 +16,34 @@ from rich.progress import (
 from rich.table import Table
 from rich.text import Text
 
+import drainloader as dl
+from drainloader.exceptions import DrainloaderError
+from drainloader.plugins import get_plugin_class
 from drainloader_cli.io import download_file
 from drainloader_cli.utils import console, sanitize_for_filesystem
 
 
 class SmartDownloadColumn(DownloadColumn):
     """DownloadColumn that only shows for 'file' type tasks with a leading bullet."""
+
     def render(self, task: Any) -> Text:
         if task.fields.get("type") != "file":
             return Text("")
         return Text.assemble(("• ", "dim"), super().render(task))
+
 
 class SmartTransferSpeedColumn(TransferSpeedColumn):
     """TransferSpeedColumn that only shows for 'file' type tasks with a leading bullet."""
+
     def render(self, task: Any) -> Text:
         if task.fields.get("type") != "file":
             return Text("")
         return Text.assemble(("• ", "dim"), super().render(task))
 
+
 class SmartTimeRemainingColumn(TimeRemainingColumn):
     """TimeRemainingColumn that only shows for 'file' type tasks with a leading bullet."""
+
     def render(self, task: Any) -> Text:
         if task.fields.get("type") != "file":
             return Text("")
@@ -128,7 +130,7 @@ def _download_with_progress(
 ) -> None:
     """Download all items with refined UI and a summary table."""
     results = []
-    
+
     progress = Progress(
         TextColumn("[bold blue]{task.fields[filename]:<40}"),
         BarColumn(bar_width=None),
@@ -169,13 +171,13 @@ def _download_with_progress(
 
             success = download_file(item, dest_path, progress, file_task, options)
             status = "Success" if success else "Failed"
-            
+
             # Record size (actual on disk)
             actual_size = dest_path.stat().st_size if dest_path.exists() else 0
             results.append((item.filename, status, actual_size))
 
             progress.remove_task(file_task)
-            
+
             # Update overall progress if it exists
             if overall is not None:
                 progress.advance(overall)
@@ -189,7 +191,12 @@ def _download_with_progress(
 def _print_summary_table(results: list, base_dir: Path, total_time: float) -> None:
     """Show a professional summary of the download batch."""
     console.print()
-    table = Table(title="Download Summary", title_style="bold green", header_style="bold cyan", border_style="dim")
+    table = Table(
+        title="Download Summary",
+        title_style="bold green",
+        header_style="bold cyan",
+        border_style="dim",
+    )
     table.add_column("File Name", overflow="fold")
     table.add_column("Status", justify="center")
     table.add_column("Size", justify="right")
@@ -198,25 +205,30 @@ def _print_summary_table(results: list, base_dir: Path, total_time: float) -> No
     success_count = 0
     for name, status, size in results:
         style = "green" if status == "Success" else "red"
-        size_str = f"{size / (1024*1024):.2f} MB"
+        size_str = f"{size / (1024 * 1024):.2f} MB"
         table.add_row(name, f"[{style}]{status}[/{style}]", size_str)
         if status == "Success":
             success_count += 1
             total_size += size
 
     console.print(table)
-    
+
     success_style = "bold green" if success_count == len(results) else "bold yellow"
-    console.print(f"[{success_style}]✓ Completed {success_count}/{len(results)} files[/{success_style}]")
-    console.print(f"[dim]Total downloaded: {total_size / (1024*1024):.2f} MB in {total_time:.1f}s[/dim]")
+    console.print(
+        f"[{success_style}]✓ Completed {success_count}/{len(results)} files[/{success_style}]"
+    )
+    console.print(
+        f"[dim]Total downloaded: {total_size / (1024 * 1024):.2f} MB in {total_time:.1f}s[/dim]"
+    )
     console.print(f"[dim]Location: {base_dir.absolute()}[/dim]\n")
-    
+
     if success_count < len(results):
         sys.exit(1)
 
 
 def _get_plugin_name(url: str) -> str | None:
     from urllib.parse import urlparse
+
     domain = urlparse(url).netloc
     plugin_class = get_plugin_class(domain)
     return plugin_class.__name__ if plugin_class else None

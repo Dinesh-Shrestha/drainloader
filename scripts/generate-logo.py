@@ -12,7 +12,6 @@ import math
 import pathlib
 import random
 
-
 # fmt: off
 CONFIG = {
     # CANVAS SETTINGS

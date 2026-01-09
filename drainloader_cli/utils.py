@@ -4,7 +4,6 @@ import re
 from rich.console import Console
 from rich.logging import RichHandler
 
-
 # Shared console instance
 console = Console()
 

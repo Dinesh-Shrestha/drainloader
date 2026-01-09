@@ -1,7 +1,6 @@
 import pytest
 
-from megaloader.plugins.pixeldrain import PixelDrain
-
+from drainloader.plugins.pixeldrain import PixelDrain
 from tests.helpers import assert_valid_item
 from tests.test_urls import PIXELDRAIN_URLS
 

@@ -1,17 +1,13 @@
 import logging
-
 from abc import ABC, abstractmethod
 from collections.abc import Generator
 from typing import Any, ClassVar
 
 import requests
-
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
-from drainloader.exceptions import DrainloaderError
 from drainloader.item import DownloadItem
-
 
 logger = logging.getLogger(__name__)
 

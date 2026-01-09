@@ -1,4 +1,4 @@
-from megaloader.item import DownloadItem
+from drainloader.item import DownloadItem
 
 
 def assert_valid_item(item: DownloadItem) -> None:

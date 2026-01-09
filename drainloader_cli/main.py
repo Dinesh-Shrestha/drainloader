@@ -121,12 +121,12 @@ def signal_handler(sig, frame):
 
 def main():
     signal.signal(signal.SIGINT, signal_handler)
-    
+
     # Run in a daemon thread for responsive interruption
     main_thread = threading.Thread(target=cli)
     main_thread.daemon = True
     main_thread.start()
-    
+
     while main_thread.is_alive():
         main_thread.join(timeout=0.1)
 

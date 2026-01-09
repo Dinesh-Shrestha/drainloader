@@ -1,6 +1,6 @@
 import pytest
 
-from megaloader.item import DownloadItem
+from drainloader.item import DownloadItem
 
 
 @pytest.mark.unit

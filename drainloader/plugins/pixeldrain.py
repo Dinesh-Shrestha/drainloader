@@ -1,14 +1,9 @@
-import json
 import logging
-import re
-
 from collections.abc import Generator
-from typing import Any
 
 from drainloader.exceptions import ExtractionError
 from drainloader.item import DownloadItem
 from drainloader.plugin import BasePlugin
-
 
 logger = logging.getLogger(__name__)
 
