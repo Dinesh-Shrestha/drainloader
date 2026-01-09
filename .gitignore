@@ -37,5 +37,3 @@ venv.bak/
 # Project specific
 uv.lock
 .python-version
-.github/
-!packages/

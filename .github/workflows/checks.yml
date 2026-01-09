@@ -3,14 +3,8 @@ name: lint and format check
 on:
   push:
     branches: ["main"]
-    paths:
-      - "**/*.py"
-      - "**/pyproject.toml"
   pull_request:
     branches: ["main"]
-    paths:
-      - "**/*.py"
-      - "**/pyproject.toml"
 
 permissions:
   contents: read
@@ -20,30 +14,22 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
 
-      - uses: astral-sh/setup-uv@be7fc19b4169c26a2aa1b8a430af391f2a96b3c9 # v7.1.4
+      - uses: astral-sh/setup-uv@v5
         with:
-          version: "0.9.10"
+          version: "latest"
 
-      - run: uv python install 3.13.7
+      - run: uv python install 3.12
 
-      - name: Install workspace dependencies
-        run: uv sync --all-packages --extra dev
+      - name: Install dependencies
+        run: uv sync --all-packages
 
-      - name: Install API dependencies
-        run: cd apps/api && uv sync --extra dev
+      - name: Check format
+        run: uv run ruff format --check .
 
-      - uses: astral-sh/ruff-action@cd51da8b6c236530bcbda64f26d5f13b98f61c73 # v3.5.1
-        with:
-          args: "format --check --diff"
+      - name: Lint
+        run: uv run ruff check .
 
-      - uses: astral-sh/ruff-action@cd51da8b6c236530bcbda64f26d5f13b98f61c73 # v3.5.1
-        with:
-          args: "check"
-
-      - name: Type check workspace
-        run: uv run mypy --exclude apps/api .
-
-      - name: Type check API
-        run: cd apps/api && uv run mypy .
+      - name: Type check
+        run: uv run mypy .

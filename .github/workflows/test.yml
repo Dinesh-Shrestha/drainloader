@@ -1,20 +1,10 @@
 name: tests
 
 on:
-  schedule:
-    - cron: "0 5 * * 1" # Run at 05:00 UTC every Monday
-  # push:
-  #   branches: ["main"]
-  #   paths:
-  #     - "pyproject.toml"
-  #     - "packages/core/**/*.py"
-  #     - "packages/core/pyproject.toml"
-  # pull_request:
-  #   branches: ["main"]
-  #   paths:
-  #     - "pyproject.toml"
-  #     - "packages/core/**/*.py"
-  #     - "packages/core/pyproject.toml"
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
   workflow_dispatch:
 
 permissions:
@@ -25,45 +15,19 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.12", "3.13"]
+        python-version: ["3.11", "3.12", "3.13"]
 
     steps:
-      - uses: actions/checkout@v6
-      - uses: astral-sh/setup-uv@be7fc19b4169c26a2aa1b8a430af391f2a96b3c9 # v7.1.4
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
         with:
-          version: "0.9.10"
+          version: "latest"
 
       - name: Set up Python
         run: uv python install ${{ matrix.python-version }}
 
       - name: Install dependencies
-        run: uv sync --extra dev --package megaloader
+        run: uv sync --all-packages
 
       - name: Run tests
-        run:
-          uv run pytest -v --tb=short --junitxml=junit.xml -o
-          junit_family=legacy
-
-      - name: Coverage & codecov (3.13 only)
-        if: matrix.python-version == '3.13'
-        run: |
-          uv run --with pytest-cov pytest \
-            --run-live \
-            --cov=megaloader \
-            --cov-report=xml \
-            --cov-report=term \
-            --junitxml=junit.xml \
-            -o junit_family=legacy
-        continue-on-error: true
-
-      - if: matrix.python-version == '3.13'
-        uses: codecov/codecov-action@5a1091511ad55cbe89839c7260b706298ca349f7 # v5.5.1
-        with:
-          files: ./coverage.xml
-
-      - name: Upload test results to Codecov
-        if: ${{ !cancelled() }}
-        uses: codecov/codecov-action@5a1091511ad55cbe89839c7260b706298ca349f7 # v5.5.1
-        with:
-          files: ./junit.xml
-          report_type: test_results
+        run: uv run pytest -v
