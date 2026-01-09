@@ -1,31 +1,36 @@
-[tool.uv.workspace]
-members = ["packages/*"]
-
 [project]
-name = "drainloader-workspace"
+name = "drainloader"
 version = "0.1.0"
 description = "Drainloader: High-speed Pixeldrain downloader"
 readme = "readme.md"
 requires-python = ">=3.10"
-license = "Apache-2.0"
-
+license = { text = "Apache-2.0" }
 authors = [
-    { name = "David Duran", email = "dadch1404@gmail.com" },
+    { name = "Dinesh Shrestha" },
 ]
-
 dependencies = [
-    "drainloader-cli",
+    "beautifulsoup4>=4.14.2",
+    "lxml>=6.0.2",
+    "requests>=2.32.5",
+    "click>=8.1.0",
+    "rich>=13.7.0",
 ]
-
-[tool.uv.sources]
-drainloader = { workspace = true }
-drainloader-cli = { workspace = true }
 
 [project.scripts]
 drainloader = "drainloader_cli.main:main"
 
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["drainloader", "drainloader_cli"]
+
+[tool.uv]
+managed = true
+
 [tool.pytest.ini_options]
-testpaths = ["packages/core/tests"]
+testpaths = ["tests"]
 python_files = ["test_*.py"]
 markers = [
     "live: mark test as requiring live network access"
@@ -40,57 +45,6 @@ target-version = "py310"
 [tool.ruff.lint]
 preview = true
 extend-select = [
-    "A",   # flake8-builtins
-    "B",   # flake8-bugbear
-    "BLE", # flake8-blind-except
-    "C4",  # flake8-comprehensions
-    "C90", # mccabe
-    "COM", # flake8-commas
-    "CPY", # flake8-copyright
-    "DTZ", # flake8-datetimez
-    "EM",  # flake8-errmsg
-    "ERA", # flake8-eradicate/eradicate
-    "EXE", # flake8-executable
-    "F",   # pyflakes
-    "FA",  # flake8-future-annotations
-    "FBT", # flake8-boolean-trap
-    "FIX", # flake8-fixme
-    "FLY", # flynt
-    "FURB", # refurb
-    "G",   # flake8-logging-format
-    "I",   # isort
-    "ICN", # flake8-import-conventions
-    "INP", # flake8-no-pep420
-    "ISC", # flake8-implicit-str-concat
-    "LOG", # flake8-logging
-    "N",   # pep8-naming
-    "PGH", # pygrep
-    "PIE", # flake8-pie
-    "PTH", # flake8-use-pathlib
-    "Q",   # flake8-quotes
-    "RET", # flake8-return
-    "RSE", # flake8-raise
-    "RUF", # ruff checks
-    "SIM", # flake8-simplify
-    "T10", # flake8-debugger
-    # "T20", # flake8-print
-    "TC",  # flake8-type-checking
-    "TD",  # flake8-todos
-    "TID", # flake8-tidy-imports
-    "TRY", # tryceratops
-    "UP",  # pyupgrade
+    "A", "B", "BLE", "C4", "C90", "F", "I", "N", "PTH", "Q", "RET", "RUF", "SIM", "UP",
 ]
-
-ignore = ["COM812", "TRY300", "CPY001"]
-
-[tool.ruff.lint.flake8-tidy-imports]
-ban-relative-imports = "all"
-
-[tool.ruff.lint.isort]
-force-single-line = false
-lines-between-types = 1
-lines-after-imports = 2
-order-by-type = true
-relative-imports-order = "closest-to-furthest"
-extra-standard-library = ["typing"]
-section-order = ["future", "standard-library", "third-party", "first-party", "local-folder"]
+ignore = ["COM812", "TRY300", "CPY001", "FBT001"]
